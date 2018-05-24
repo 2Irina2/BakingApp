@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:design="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+                android:id="@+id/fragment_step_video"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/fragment_step_video_height"/>
+
+            <TextView
+                android:id="@+id/fragment_step_instruction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fragment_step_video"
+                android:textSize="20sp"
+                tools:hint="@string/fragment_step_instruction_hint"
+                android:paddingTop="@dimen/fragment_step_instruction_padding_top"
+                android:paddingLeft="@dimen/fragment_step_instruction_padding_left"
+                android:paddingStart="@dimen/fragment_step_instruction_padding_left"
+                android:paddingRight="@dimen/fragment_step_instruction_padding_right"
+                android:paddingEnd="@dimen/fragment_step_instruction_padding_right"
+                />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/fragment_step_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="bottom"
+        app:itemIconTint="@color/bottom_navigation_colors"
+        app:itemTextColor="@color/bottom_navigation_colors"
+        design:menu="@menu/menu_bottom_nav_items"/>
+
+</LinearLayout>

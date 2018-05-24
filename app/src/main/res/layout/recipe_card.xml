@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/recipe_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/recipe_card_padding_top"
+    android:paddingLeft="@dimen/recipe_card_padding_left"
+    android:paddingStart="@dimen/recipe_card_padding_left"
+    android:paddingRight="@dimen/recipe_card_padding_right"
+    android:paddingEnd="@dimen/recipe_card_padding_right"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="7">
+
+        <TextView
+            android:id="@+id/recipe_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:hint="@string/recipe_card_name_text"
+            android:textSize="@dimen/recipe_card_name_text_size"
+            android:textColor="@color/colorPrimaryDark"
+            />
+
+        <TextView
+            android:id="@+id/recipe_item_servings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recipe_item_name"
+            tools:hint="@string/recipe_card_servings_text"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:id="@+id/recipe_item_ingredients"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recipe_item_servings"
+            tools:hint="@string/recipe_card_ingredients_text"
+            android:textColor="@color/colorPrimaryDark"/>
+
+    </RelativeLayout>
+
+
+    <ImageView
+        android:id="@+id/recipe_item_next"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_chevron_right_black_48dp"
+        android:contentDescription="@string/recipe_card_proceed_content_descriptor"
+        android:paddingLeft="@dimen/recipe_card_proceed_padding_left"
+        android:paddingStart="@dimen/recipe_card_proceed_padding_left"
+        tools:ignore="RtlSymmetry" />
+
+</LinearLayout>

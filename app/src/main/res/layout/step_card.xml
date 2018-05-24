@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/step_card_tv"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/step_card_padding_top"
+    android:paddingRight="@dimen/step_card_padding_right"
+    android:paddingLeft="@dimen/step_card_padding_left"
+    tools:hint="@string/step_card_text"
+    android:paddingEnd="@dimen/step_card_padding_right"
+    android:textSize="@dimen/step_card_text_size"
+    android:paddingStart="@dimen/step_card_padding_left">
+
+</TextView>
