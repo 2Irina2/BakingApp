@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.android.bakingapp.Classes.Recipe;
 import com.example.android.bakingapp.R;
+import com.example.android.bakingapp.StepActivity;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
@@ -82,14 +83,18 @@ public class StepFragment extends Fragment {
                 return true;
             }
         });
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            goFullScreen();
-            mSimpleExoPlayerView.getLayoutParams().height = FrameLayout.LayoutParams.MATCH_PARENT;
-        }
-        else {
+        if(getActivity().getClass().getName() == StepActivity.class.getName()){
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                goFullScreen();
+                mSimpleExoPlayerView.getLayoutParams().height = FrameLayout.LayoutParams.MATCH_PARENT;
+            }
+            else {
+                goNormalScreen();
+            }
+        } else {
             goNormalScreen();
         }
+
 
         initializePlayer(mRecipe.getSteps().get(mIndex).getVideoUrl());
 
