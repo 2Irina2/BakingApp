@@ -1,18 +1,23 @@
 package com.example.android.bakingapp;
 
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Parcelable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.bakingapp.Classes.Recipe;
+import com.example.android.bakingapp.Utils.RecyclerViewItemClickListener;
 import com.example.android.bakingapp.Utils.RequestUtils;
 
 import org.json.JSONException;
@@ -21,24 +26,51 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListActivity extends AppCompatActivity implements RecyclerViewItemClickListener {
+import butterknife.BindView;
+
+public class ListActivity extends AppCompatActivity implements RecyclerViewItemClickListener,
+        LoaderManager.LoaderCallbacks<List<Recipe>>{
 
     private static final String TAG = ListActivity.class.getName();
+    private static final int RECIPE_LOADER_ID = 0;
 
-    private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
-    private List<Recipe> finalRecipeList = new ArrayList<Recipe>();
+    private static List<Recipe> finalRecipeList = new ArrayList<Recipe>();
+    private RecyclerView recyclerView;
+    @BindView(R.id.error_message) LinearLayout errorDisplayLinearLayout;
+    @BindView(R.id.loading_indicator) ProgressBar loadingIndicatorProgressBar;
+    @BindView(R.id.error_message_tv) TextView errorTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        recyclerView = findViewById(R.id.recipe_list_rv);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        if(findViewById(R.id.recipe_list_rv_tablet) != null){
+            recyclerView = findViewById(R.id.recipe_list_rv_tablet);
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        } else {
+            recyclerView = findViewById(R.id.recipe_list_rv);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        }
+        errorDisplayLinearLayout = findViewById(R.id.error_message);
+        loadingIndicatorProgressBar = findViewById(R.id.loading_indicator);
+        errorTv = findViewById(R.id.error_message_tv);
 
-        if(RequestUtils.hasInternetAccess(this) && finalRecipeList.size() == 0){
-            new RecipeQueryTask().execute(RequestUtils.REQUEST_URL);
+        if(finalRecipeList.size() == 0){
+            if(RequestUtils.hasInternetAccess(this)){
+                getSupportLoaderManager().initLoader(RECIPE_LOADER_ID, null, ListActivity.this);
+                errorDisplayLinearLayout.setVisibility(View.INVISIBLE);
+                loadingIndicatorProgressBar.setVisibility(View.VISIBLE);
+            } else {
+                errorDisplayLinearLayout.setVisibility(View.VISIBLE);
+                errorTv.setText(getResources().getString(R.string.error_internet_connection));
+            }
+        } else {
+            errorDisplayLinearLayout.setVisibility(View.INVISIBLE);
+            loadingIndicatorProgressBar.setVisibility(View.INVISIBLE);
+            recipeAdapter = new RecipeAdapter(getApplicationContext(), finalRecipeList, ListActivity.this);
+            recyclerView.setAdapter(recipeAdapter);
         }
     }
 
@@ -50,12 +82,38 @@ public class ListActivity extends AppCompatActivity implements RecyclerViewItemC
         startActivity(intent);
     }
 
+    @Override
+    public Loader<List<Recipe>> onCreateLoader(int id, Bundle args) {
+        return new RecipeQueryLoader(this);
 
-    public class RecipeQueryTask extends AsyncTask<String, Void, List<Recipe>>{
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Recipe>> loader, List<Recipe> data) {
+        recipeAdapter = new RecipeAdapter(getApplicationContext(), data, ListActivity.this);
+        recyclerView.setAdapter(recipeAdapter);
+        loadingIndicatorProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Recipe>> loader) {
+
+    }
+
+
+    public static class RecipeQueryLoader extends AsyncTaskLoader<List<Recipe>> {
+        public RecipeQueryLoader(Context context) {
+            super(context);
+        }
 
         @Override
-        protected List<Recipe> doInBackground(String... strings) {
+        protected void onStartLoading() {
+            forceLoad();
 
+        }
+
+        @Override
+        public List<Recipe> loadInBackground() {
             List<Recipe> recipeList = new ArrayList<Recipe>();
 
             String jsonResp = "";
@@ -71,12 +129,6 @@ public class ListActivity extends AppCompatActivity implements RecyclerViewItemC
             Log.e(TAG, "Successfully completed network request and data parsing");
             finalRecipeList = recipeList;
             return recipeList;
-        }
-
-        @Override
-        protected void onPostExecute(List<Recipe> recipeList) {
-            recipeAdapter = new RecipeAdapter(getApplicationContext(), recipeList, ListActivity.this);
-            recyclerView.setAdapter(recipeAdapter);
         }
     }
 }

@@ -1,22 +1,19 @@
 package com.example.android.bakingapp.Fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerViewAccessibilityDelegate;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.android.bakingapp.Classes.Recipe;
 import com.example.android.bakingapp.MasterRecyclerViewAdapter;
 import com.example.android.bakingapp.R;
-import com.example.android.bakingapp.RecyclerViewItemClickListener;
+import com.example.android.bakingapp.Utils.RecyclerViewItemClickListener;
 
 public class MasterFragment extends Fragment {
 
@@ -44,8 +41,8 @@ public class MasterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_master, container, false);
 
-        if (savedInstanceState != null) {
-            mRecipe = savedInstanceState.getParcelable("recipeMaster");
+        if(savedInstanceState != null){
+            mRecipe = savedInstanceState.getParcelable("recipe");
         }
 
         mRecyclerView = rootView.findViewById(R.id.fragment_master_rv);
@@ -59,7 +56,8 @@ public class MasterFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("recipeMaster", mRecipe);
+
+        outState.putParcelable("recipe", mRecipe);
     }
 
     public void setRecipe(Recipe recipe){

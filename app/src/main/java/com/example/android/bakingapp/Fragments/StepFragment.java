@@ -1,5 +1,6 @@
 package com.example.android.bakingapp.Fragments;
 
+import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +12,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.bakingapp.Classes.Recipe;
 import com.example.android.bakingapp.R;
@@ -24,6 +28,7 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -32,6 +37,8 @@ public class StepFragment extends Fragment {
 
     private Recipe mRecipe;
     private int mIndex;
+    private long mPlayerPositon;
+    private TextView mInstruction;
     private SimpleExoPlayer mSimpleExoPlayer;
     private SimpleExoPlayerView mSimpleExoPlayerView;
     private BottomNavigationView mBottomNavigationView;
@@ -46,14 +53,15 @@ public class StepFragment extends Fragment {
 
         if(savedInstanceState != null){
             mRecipe = savedInstanceState.getParcelable("recipeStep");
-            mIndex = savedInstanceState.getInt("indexStep");
+            mIndex = savedInstanceState.getInt("indexStep", 0);
+            mPlayerPositon = savedInstanceState.getLong("playerPosition", 0);
         }
 
-        final TextView instruction = rootView.findViewById(R.id.fragment_step_instruction);
+        mInstruction = rootView.findViewById(R.id.fragment_step_instruction);
         mBottomNavigationView = rootView.findViewById(R.id.fragment_step_navigation);
         mSimpleExoPlayerView = rootView.findViewById(R.id.fragment_step_video);
 
-        instruction.setText(mRecipe.getSteps().get(mIndex).getLongDescription());
+        mInstruction.setText(mRecipe.getSteps().get(mIndex).getLongDescription());
 
 
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -62,21 +70,28 @@ public class StepFragment extends Fragment {
                 if(item.getTitle().equals(getResources().getString(R.string.fragment_step_navigation_previous))){
                     if(mIndex > 0){
                         mIndex--;
-
                     }
                 } else if(item.getTitle().equals(getResources().getString(R.string.fragment_step_navigation_next))){
                     if(mIndex < mRecipe.getSteps().size()-1 ){
                         mIndex++;
                     }
                 }
-                instruction.setText(mRecipe.getSteps().get(mIndex).getLongDescription());
+                mInstruction.setText(mRecipe.getSteps().get(mIndex).getLongDescription());
                 releasePlayer();
                 initializePlayer(mRecipe.getSteps().get(mIndex).getVideoUrl());
                 return true;
             }
         });
 
-            initializePlayer(mRecipe.getSteps().get(mIndex).getVideoUrl());
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            goFullScreen();
+            mSimpleExoPlayerView.getLayoutParams().height = FrameLayout.LayoutParams.MATCH_PARENT;
+        }
+        else {
+            goNormalScreen();
+        }
+
+        initializePlayer(mRecipe.getSteps().get(mIndex).getVideoUrl());
 
         return rootView;
     }
@@ -86,6 +101,7 @@ public class StepFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putParcelable("recipeStep", mRecipe);
         outState.putInt("indexStep", mIndex);
+        outState.putLong("playerPosition", mPlayerPositon);
     }
 
     public void setRecipe(Recipe recipe){
@@ -102,17 +118,19 @@ public class StepFragment extends Fragment {
             LoadControl loadControl = new DefaultLoadControl();
             mSimpleExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
             mSimpleExoPlayerView.setPlayer(mSimpleExoPlayer);
+            mSimpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
 
             if(mediaUrl.isEmpty()){
                 mSimpleExoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(
                         getResources(), R.drawable.no_video));
-                mSimpleExoPlayerView.hideController();
+                mSimpleExoPlayerView.setUseController(false);
             } else {
                 Uri mediaUri = Uri.parse(mediaUrl);
                 String userAgent = Util.getUserAgent(getContext(), "BakingApp");
                 MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                         getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
                 mSimpleExoPlayer.prepare(mediaSource);
+                mSimpleExoPlayer.seekTo(mPlayerPositon);
                 mSimpleExoPlayer.setPlayWhenReady(true);
             }
         }
@@ -121,9 +139,20 @@ public class StepFragment extends Fragment {
     private void releasePlayer(){
         if(mSimpleExoPlayer != null) {
             mSimpleExoPlayer.stop();
+            mPlayerPositon = mSimpleExoPlayer.getCurrentPosition();
             mSimpleExoPlayer.release();
             mSimpleExoPlayer = null;
         }
+    }
+
+    private void goFullScreen(){
+        mBottomNavigationView.setVisibility(View.GONE);
+        mInstruction.setVisibility(View.GONE);
+    }
+
+    private void goNormalScreen(){
+        mBottomNavigationView.setVisibility(View.VISIBLE);
+        mInstruction.setVisibility(View.VISIBLE);
     }
 
     @Override

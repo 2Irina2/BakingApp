@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.bakingapp.Classes.Recipe;
 import com.example.android.bakingapp.Classes.Step;
+import com.example.android.bakingapp.Utils.RecyclerViewItemClickListener;
 
 import java.util.List;
 

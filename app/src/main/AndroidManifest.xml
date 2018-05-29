@@ -20,13 +20,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RecipeActivity"
-            android:parentActivityName="com.example.android.bakingapp.ListActivity"
+        <activity
+            android:name=".RecipeActivity"
+            android:launchMode="singleTask"
+            android:parentActivityName=".ListActivity"
             tools:targetApi="jelly_bean">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.bakingapp.ListActivity" />
         </activity>
+        <activity android:name=".StepActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.bakingapp.RecipeActivity" />
+        </activity>
+
+        <receiver android:name=".Widget.RecipeWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/recipe_widget_provider_info" />
+        </receiver>
     </application>
 
 </manifest>

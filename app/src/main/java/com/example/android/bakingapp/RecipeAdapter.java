@@ -1,6 +1,5 @@
 package com.example.android.bakingapp;
 
-import android.app.IntentService;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +9,7 @@ import android.widget.TextView;
 
 import com.example.android.bakingapp.Classes.Ingredient;
 import com.example.android.bakingapp.Classes.Recipe;
+import com.example.android.bakingapp.Utils.RecyclerViewItemClickListener;
 
 import java.util.List;
 import java.util.Locale;
@@ -40,15 +40,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
 
         holder.recipeName.setText(recipe.getName());
         holder.recipeServings.setText(String.format(Locale.getDefault(),"Servings: %d", recipe.getServings()));
-        StringBuilder ingredientsBuilder = new StringBuilder();
-        List<Ingredient> ingredientList = recipe.getIngredients();
-        int i;
-        ingredientsBuilder.append("Ingredients: ");
-        for(i = 0; i < ingredientList.size() - 1; i++){
-            ingredientsBuilder.append(ingredientList.get(i).getIngredient()).append(", ");
-        }
-        ingredientsBuilder.append(ingredientList.get(i).getIngredient()).append(".");
-        holder.recipeIngredients.setText(ingredientsBuilder.toString());
+        holder.recipeIngredients.setText(String.format(Locale.getDefault(), "Ingredients: %s", recipe.getIngredientsChunk()));
     }
 
     @Override

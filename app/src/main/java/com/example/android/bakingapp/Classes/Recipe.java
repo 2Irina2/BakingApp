@@ -62,6 +62,17 @@ public class Recipe implements Parcelable{
         return mIngredients;
     }
 
+    public String getIngredientsChunk(){
+        StringBuilder ingredientsBuilder = new StringBuilder();
+        int i;
+        for(i = 0; i < mIngredients.size() - 1; i++){
+            ingredientsBuilder.append(mIngredients.get(i).getIngredient()).append(", ");
+        }
+        ingredientsBuilder.append(mIngredients.get(i).getIngredient()).append(".");
+
+        return ingredientsBuilder.toString();
+    }
+
     @Override
     public int describeContents() {
         return 0;
