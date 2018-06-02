@@ -15,7 +15,7 @@
     <string name="fragment_step_navigation_next">Next</string>
 
 
-    <string name="recipe_widget_title">Ingredients</string>
     <string name="recipe_widget">Add widget</string>
-    <string name="recipe_widget_ingredients_default">No recipe selected yet. Get cookin`!</string>
+    <string name="recipe_widget_ingredients_default">Get cookin`!</string>
+    <string name="recipe_widget_title_default">No recipe selected</string>
 </resources>

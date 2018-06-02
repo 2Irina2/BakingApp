@@ -27,14 +27,13 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        CharSequence widgetText = context.getString(R.string.recipe_widget_title);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_provider);
-        views.setTextViewText(R.id.recipe_widget_title_tv, widgetText);
 
         Intent intent = new Intent(context, RecipeActivity.class);
         if(mRecipe == null){
             intent = new Intent(context, ListActivity.class);
             views.setTextViewText(R.id.recipe_widget_ingredients_tv, context.getString(R.string.recipe_widget_ingredients_default));
+            views.setTextViewText(R.id.recipe_widget_title_tv, context.getString(R.string.recipe_widget_title_default));
         }
         intent.putExtra("recipe", mRecipe);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
@@ -70,6 +69,7 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_provider);
             mRecipe = intent.getParcelableExtra("recipe");
             views.setTextViewText(R.id.recipe_widget_ingredients_tv, mRecipe.getIngredientsChunk());
+            views.setTextViewText(R.id.recipe_widget_title_tv, mRecipe.getName());
             // This time we dont have widgetId. Reaching our widget with that way.
             ComponentName appWidget = new ComponentName(context, RecipeWidgetProvider.class);
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);

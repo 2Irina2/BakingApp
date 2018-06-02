@@ -1,7 +1,9 @@
 package com.example.android.bakingapp.Fragments;
 
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,12 +35,16 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
+
+import java.lang.annotation.Target;
 
 public class StepFragment extends Fragment {
 
     private Recipe mRecipe;
     private int mIndex;
     private long mPlayerPositon;
+    private boolean mIsPlayWhenReady = true;
     private TextView mInstruction;
     private SimpleExoPlayer mSimpleExoPlayer;
     private SimpleExoPlayerView mSimpleExoPlayerView;
@@ -56,6 +62,7 @@ public class StepFragment extends Fragment {
             mRecipe = savedInstanceState.getParcelable("recipeStep");
             mIndex = savedInstanceState.getInt("indexStep", 0);
             mPlayerPositon = savedInstanceState.getLong("playerPosition", 0);
+            mIsPlayWhenReady = savedInstanceState.getBoolean("isPlayWhenReady");
         }
 
         mInstruction = rootView.findViewById(R.id.fragment_step_instruction);
@@ -79,7 +86,8 @@ public class StepFragment extends Fragment {
                 }
                 mInstruction.setText(mRecipe.getSteps().get(mIndex).getLongDescription());
                 releasePlayer();
-                initializePlayer(mRecipe.getSteps().get(mIndex).getVideoUrl());
+                mIsPlayWhenReady = true;
+                initializePlayer(mRecipe.getSteps().get(mIndex).getVideoUrl(), mRecipe.getSteps().get(mIndex).getThumbnailUrl());
                 return true;
             }
         });
@@ -96,7 +104,7 @@ public class StepFragment extends Fragment {
         }
 
 
-        initializePlayer(mRecipe.getSteps().get(mIndex).getVideoUrl());
+        initializePlayer(mRecipe.getSteps().get(mIndex).getVideoUrl(), mRecipe.getSteps().get(mIndex).getThumbnailUrl());
 
         return rootView;
     }
@@ -107,6 +115,7 @@ public class StepFragment extends Fragment {
         outState.putParcelable("recipeStep", mRecipe);
         outState.putInt("indexStep", mIndex);
         outState.putLong("playerPosition", mPlayerPositon);
+        outState.putBoolean("isPlayWhenReady", mIsPlayWhenReady);
     }
 
     public void setRecipe(Recipe recipe){
@@ -117,7 +126,7 @@ public class StepFragment extends Fragment {
         mIndex = i;
     }
 
-    private void initializePlayer(String mediaUrl){
+    private void initializePlayer(String mediaUrl, String thumbnailUrl){
         if(mSimpleExoPlayer == null){
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
@@ -126,8 +135,33 @@ public class StepFragment extends Fragment {
             mSimpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
 
             if(mediaUrl.isEmpty()){
-                mSimpleExoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(
-                        getResources(), R.drawable.no_video));
+
+                if(!thumbnailUrl.isEmpty()){
+                    Picasso.with(getContext())
+                            .load(thumbnailUrl)
+                            .into(new com.squareup.picasso.Target() {
+                                @Override
+                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                    mSimpleExoPlayerView.setDefaultArtwork(bitmap);
+                                }
+
+                                @Override
+                                public void onBitmapFailed(Drawable errorDrawable) {
+                                    mSimpleExoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(
+                                            getResources(), R.drawable.no_video));
+                                }
+
+                                @Override
+                                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                }
+                            });
+
+                } else {
+                    mSimpleExoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(
+                            getResources(), R.drawable.no_video));
+                }
+
                 mSimpleExoPlayerView.setUseController(false);
             } else {
                 Uri mediaUri = Uri.parse(mediaUrl);
@@ -136,7 +170,8 @@ public class StepFragment extends Fragment {
                         getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
                 mSimpleExoPlayer.prepare(mediaSource);
                 mSimpleExoPlayer.seekTo(mPlayerPositon);
-                mSimpleExoPlayer.setPlayWhenReady(true);
+                mSimpleExoPlayer.setPlayWhenReady(mIsPlayWhenReady);
+                mSimpleExoPlayerView.setUseController(true);
             }
         }
     }
@@ -145,6 +180,7 @@ public class StepFragment extends Fragment {
         if(mSimpleExoPlayer != null) {
             mSimpleExoPlayer.stop();
             mPlayerPositon = mSimpleExoPlayer.getCurrentPosition();
+            mIsPlayWhenReady = mSimpleExoPlayer.getPlayWhenReady();
             mSimpleExoPlayer.release();
             mSimpleExoPlayer = null;
         }

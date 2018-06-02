@@ -34,6 +34,13 @@ public class ListActivityBasicTest {
 
     @Test
     public void clickRecyclerViewItem_startRecipeActivity(){
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
         onView(withId(R.id.recipe_list_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
         onView(allOf(isDescendantOfA(withResourceName("android:id/action_bar_container")), withText("Brownies")));
     }

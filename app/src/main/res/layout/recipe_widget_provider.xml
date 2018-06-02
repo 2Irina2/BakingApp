@@ -10,8 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/widget_title_margin"
-        android:contentDescription="@string/recipe_widget_title"
-        android:text="@string/recipe_widget_title"
+        android:contentDescription="@string/recipe_widget_title_default"
+        android:text="@string/recipe_widget_title_default"
         android:textColor="@color/color_widget_title"
         android:textSize="@dimen/widget_title_text_size"
         android:textStyle="bold|italic" />
